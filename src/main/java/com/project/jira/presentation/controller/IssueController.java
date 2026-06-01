@@ -4,9 +4,10 @@ import com.project.jira.application.dto.IssueDTO;
 import com.project.jira.application.service.IssueService;
 import com.project.jira.domain.entity.Issue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/v1/issues")
 @RequiredArgsConstructor
 @Tag(name = "Issues", description = "API para gerenciamento de issues/tarefas")
+@SecurityRequirement(name = "bearerAuth")
 public class IssueController {
 
     private final IssueService issueService;

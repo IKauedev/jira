@@ -23,6 +23,10 @@ spring:
     restart:
       enabled: true
 
+  graphql:
+    graphiql:
+      enabled: true
+
 # Server Configuration
 server:
   port: 8080
@@ -32,9 +36,8 @@ server:
 # Swagger/OpenAPI Configuration
 springdoc:
   api-docs:
-    path: /api-docs
+    path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
     enabled: true
     operations-sorter: method
     tags-sorter: alpha
@@ -63,3 +66,5 @@ app:
   title: Jira Backend Application
   description: API Backend Jira com gerenciamento de projetos, issues e integrações
   environment: default
+  password-reset:
+    expiration-hours: 24

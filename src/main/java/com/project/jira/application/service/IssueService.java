@@ -48,6 +48,13 @@ public class IssueService {
                 .orElseThrow(() -> new RuntimeException("Issue não encontrada"));
     }
 
+    public List<IssueDTO> getAllIssues() {
+        return issueRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
     public List<IssueDTO> getIssuesByProjectId(String projectId) {
         return issueRepository.findByProjectId(projectId)
                 .stream()

@@ -9,12 +9,15 @@ use jira_db;
 // ============================================
 // Collection: users
 // ============================================
+// NOTA: Todas as senhas são "Password123!" (BCrypt hash)
+// Em produção, os usuários devem ser criados via API POST /api/v1/users
 db.users.insertMany([
   {
     "_id": ObjectId("66666666666666666666661"),
     "username": "admin.user",
     "email": "admin@example.com",
     "fullName": "Administrador do Sistema",
+    "password": "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl1baWRC3Su",
     "avatarUrl": "https://i.pravatar.cc/150?u=admin@example.com",
     "role": "ADMIN",
     "active": true,
@@ -26,6 +29,7 @@ db.users.insertMany([
     "username": "joao.silva",
     "email": "joao.silva@example.com",
     "fullName": "João Silva",
+    "password": "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl1baWRC3Su",
     "avatarUrl": "https://i.pravatar.cc/150?u=joao@example.com",
     "role": "DEVELOPER",
     "active": true,
@@ -37,6 +41,7 @@ db.users.insertMany([
     "username": "maria.santos",
     "email": "maria.santos@example.com",
     "fullName": "Maria Santos",
+    "password": "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl1baWRC3Su",
     "avatarUrl": "https://i.pravatar.cc/150?u=maria@example.com",
     "role": "MANAGER",
     "active": true,
@@ -48,6 +53,7 @@ db.users.insertMany([
     "username": "carlos.oliveira",
     "email": "carlos.oliveira@example.com",
     "fullName": "Carlos Oliveira",
+    "password": "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl1baWRC3Su",
     "avatarUrl": "https://i.pravatar.cc/150?u=carlos@example.com",
     "role": "DEVELOPER",
     "active": true,
@@ -59,6 +65,7 @@ db.users.insertMany([
     "username": "ana.costa",
     "email": "ana.costa@example.com",
     "fullName": "Ana Costa",
+    "password": "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl1baWRC3Su",
     "avatarUrl": "https://i.pravatar.cc/150?u=ana@example.com",
     "role": "VIEWER",
     "active": true,
@@ -281,6 +288,12 @@ db.issues.createIndex({ "dueDate": 1 });
 db.comments.createIndex({ "issueId": 1 });
 db.comments.createIndex({ "author": 1 });
 db.comments.createIndex({ "createdAt": 1 });
+
+// Índices para Password Reset Tokens
+db.password_reset_tokens.createIndex({ "token": 1 }, { unique: true });
+db.password_reset_tokens.createIndex({ "userId": 1 });
+db.password_reset_tokens.createIndex({ "email": 1 });
+db.password_reset_tokens.createIndex({ "expiresAt": 1 }, { expireAfterSeconds: 0 });
 
 // ============================================
 // Validação

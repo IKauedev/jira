@@ -1,0 +1,101 @@
+type Query {
+  projects: [Project!]!
+  project(id: ID!): Project
+  projectByKey(key: String!): Project
+  projectsByLead(lead: String!): [Project!]!
+
+  issues: [Issue!]!
+  issue(id: ID!): Issue
+  issueByKey(key: String!): Issue
+  issuesByProjectId(projectId: ID!): [Issue!]!
+  issuesByAssignee(assignee: String!): [Issue!]!
+  issuesByStatus(status: IssueStatus!): [Issue!]!
+  issuesByProjectAndStatus(projectId: ID!, status: IssueStatus!): [Issue!]!
+
+  users: [User!]!
+  user(id: ID!): User
+  userByUsername(username: String!): User
+  userByEmail(email: String!): User
+  usersByRole(role: UserRole!): [User!]!
+}
+
+type Project {
+  id: ID
+  key: String
+  name: String
+  description: String
+  lead: String
+  category: String
+  projectType: ProjectType
+  createdAt: String
+  updatedAt: String
+}
+
+type Issue {
+  id: ID
+  key: String
+  projectId: ID
+  summary: String
+  description: String
+  issueType: IssueType
+  priority: IssuePriority
+  status: IssueStatus
+  assignee: String
+  reporter: String
+  labels: [String!]
+  components: [String!]
+  createdAt: String
+  updatedAt: String
+  dueDate: String
+}
+
+type User {
+  id: ID
+  username: String
+  email: String
+  fullName: String
+  avatarUrl: String
+  role: UserRole
+  active: Boolean
+  createdAt: String
+  updatedAt: String
+}
+
+enum ProjectType {
+  SOFTWARE
+  SERVICE_MANAGEMENT
+  BUSINESS
+}
+
+enum IssueType {
+  BUG
+  FEATURE
+  TASK
+  IMPROVEMENT
+  EPIC
+  SUBTASK
+}
+
+enum IssuePriority {
+  LOWEST
+  LOW
+  MEDIUM
+  HIGH
+  HIGHEST
+}
+
+enum IssueStatus {
+  BACKLOG
+  TO_DO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  CLOSED
+}
+
+enum UserRole {
+  ADMIN
+  DEVELOPER
+  MANAGER
+  VIEWER
+}
