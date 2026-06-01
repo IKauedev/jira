@@ -1,0 +1,23 @@
+FROM eclipse-temurin:21-jdk-noble AS builder
+
+WORKDIR /app
+
+COPY gradlew .
+COPY gradlew.bat .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY integration-lib integration-lib
+COPY integration-service integration-service
+
+RUN chmod +x gradlew && ./gradlew :integration-service:build -x test
+
+FROM eclipse-temurin:21-jre-noble
+
+WORKDIR /app
+
+COPY --from=builder /app/integration-service/build/libs/*.jar app.jar
+
+EXPOSE 8081
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

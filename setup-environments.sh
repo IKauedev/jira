@@ -111,7 +111,7 @@ if [ "$DOCKER_AVAILABLE" = true ]; then
     if [ "$PROFILE" = "prod" ]; then
       echo -e "${YELLOW}Pulando MongoDB em produção (usar servidor remoto)${NC}"
     else
-      docker-compose -f docker-compose.override.yml up -d mongodb 2>/dev/null || \
+      docker-compose -f docker/docker-compose.override.yml up -d mongodb 2>/dev/null || \
       docker run -d -p 27017:27017 --name jira-mongodb mongo:6
 
       echo -e "${GREEN}✅ MongoDB iniciado${NC}"

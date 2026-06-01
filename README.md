@@ -1,340 +1,280 @@
-# Jira Backend - Sistema Completo
+# Jira Backend
 
-## 🚀 Início Rápido
+Backend em Java 21 com Spring Boot para gerenciamento de projetos, issues, usuários, comentários, autenticação JWT, GraphQL e serviços de integração.
 
-**👉 Comece aqui:** [QUICK_START.md](QUICK_START.md) - Setup em 4 passos
+## Serviços
 
-**📚 Índice completo:** [INDEX.md](INDEX.md) - Todos os documentos
+- `jira-app`: API principal na porta `8080`.
+- `integration-service`: API de integrações na porta `8081`.
+- `mongodb`: banco de dados usado pelos serviços.
 
-## 🔐 Autenticação JWT
+## Tecnologias
 
-A API agora requer **Bearer Token JWT** para autenticação:
+- Java 21
+- Spring Boot 3.5.3
+- Spring Web
+- Spring Security
+- Spring Data MongoDB
+- Spring GraphQL
+- SpringDoc OpenAPI / Swagger UI
+- JWT com JJWT
+- Lombok
+- Gradle
+- Docker Compose
+
+## Executar
 
 ```bash
-# 1. Fazer login
+docker-compose -f docker/docker-compose.override.yml up --build
+```
+
+Se estiver dentro da pasta `docker`, use:
+
+```bash
+docker-compose -f docker-compose.override.yml up --build
+```
+
+Ou localmente:
+
+```bash
+./gradlew bootRun
+```
+
+No Windows:
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+## URLs
+
+- Jira API: `http://localhost:8080`
+- Jira Swagger: `http://localhost:8080/swagger-ui.html`
+- Jira OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- GraphiQL: `http://localhost:8080/graphiql`
+- GraphQL endpoint: `POST http://localhost:8080/graphql`
+- Integration Swagger: `http://localhost:8081/swagger-ui.html`
+- Integration OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+
+## Autenticação
+
+A maioria das rotas da API principal usa Bearer token JWT.
+
+Usuários de seed em `mongodb-init.js` usam a senha:
+
+```text
+Password123!
+```
+
+Login:
+
+```http
 POST /api/v1/auth/login
+Content-Type: application/json
+
 {
-  "username": "joao.silva",
-  "password": "password123"
+  "username": "admin.user",
+  "password": "Password123!"
 }
-
-# 2. Usar token em requisições
-GET /api/v1/projects
-Authorization: Bearer {seu-token-aqui}
 ```
 
-**Documentação:** [AUTHENTICATION.md](AUTHENTICATION.md)
+Use o token retornado nas rotas protegidas:
 
-## 🌍 Múltiplos Ambientes
-
-A aplicação suporta **3 ambientes** com configurações diferentes:
-
-| Ambiente | Command | Config |
-|----------|---------|--------|
-| **Development** | `./gradlew bootRun` | Dev (inseguro) |
-| **Homologation** | `java -jar app.jar --spring.profiles.active=homolog` | Teste |
-| **Production** | `JWT_SECRET=... java -jar app.jar --spring.profiles.active=prod` | Seguro |
-
-**Documentação:** [ENVIRONMENTS.md](ENVIRONMENTS.md)
-
-## Visão Geral
-
-Este é um projeto backend completo para Jira, estruturado em três módulos:
-
-1. **jira** - Aplicação principal de gerenciamento de projetos e issues
-2. **integration-lib** - Biblioteca centralizada de integrações de APIs
-3. **integration-service** - Serviço dedicado para gerenciar integrações com plataformas externas
-
-## Arquitetura
-
-```
-jira/
-├── src/main/java/com/project/jira/
-│   ├── config/              # Configurações (Swagger, Security, etc)
-│   ├── domain/
-│   │   ├── entity/          # Entidades (Project, Issue, User)
-│   │   └── repository/      # Repositórios MongoDB
-│   ├── application/
-│   │   ├── dto/             # Data Transfer Objects
-│   │   ├── service/         # Lógica de negócio + AuthService
-│   │   └── service/         # Lógica de negócio
-│   ├── infrastructure/
-│   │   ├── security/        # JwtUtil, JwtAuthenticationFilter
-│   │   └── exception/       # Handlers de exceção
-│   ├── presentation/
-│   │   ├── controller/      # REST Controllers
-│   │   └── controller/      # AuthController (novo)
-│   └── JiraApplication.java # Classe principal
-│
-├── integration-lib/
-│   └── src/main/java/com/project/integration/
-│       ├── client/          # Clientes de integração (GitHub, Slack)
-│       ├── service/         # Serviço de integração
-│       └── config/          # Configurações de integrações
-│
-└── integration-service/
-    ├── src/main/java/com/project/integration/
-    │   ├── config/          # Configurações específicas
-    │   └── presentation/
-    │       └── controller/  # Controllers de integrações
-    └── src/main/resources/
-        └── application.properties
+```http
+Authorization: Bearer <token>
 ```
 
-## Tecnologias Utilizadas
+No Swagger, clique em **Authorize** e informe:
 
-- **Java 21** (LTS)
-- **Spring Boot 3.5.3**
-- **MongoDB** - Banco de dados
-- **Spring Data MongoDB** - Acesso a dados
-- **Spring Security** - Autenticação e autorização
-- **JWT (JJWT)** - Tokens Bearer
-- **Swagger/OpenAPI 3.0** - Documentação de API
-- **Lombok** - Redução de boilerplate
-- **Gradle** - Build tool
-
-## Componentes Principais
-
-### 1. Jira Application (Porto 8080)
-
-#### Autenticação
-- **JWT Bearer Token** - Tokens JWT de curta duração
-- **3 Ambientes** - Dev, Homolog, Produção
-- **Secrets Dinâmicos** - Configuração via variáveis de ambiente
-
-#### Entidades
-- **Project** - Projetos com tipos (SOFTWARE, SERVICE_MANAGEMENT, BUSINESS)
-- **Issue** - Issues com tipos, prioridades e status
-- **User** - Usuários com diferentes papéis
-- **Comment** - Comentários em issues
-
-#### Serviços
-- **ProjectService** - CRUD de projetos
-- **IssueService** - CRUD de issues e filtros
-- **UserService** - Gerenciamento de usuários
-- **AuthService** - Autenticação e geração de tokens
-
-#### Endpoints de Autenticação
-- `POST /api/v1/auth/login` - Login e gerar token
-- `POST /api/v1/auth/token/{userId}` - Gerar token para usuário
-- `GET /api/v1/auth/validate` - Validar token Bearer
-
-#### Endpoints de Projetos
-- `GET /api/v1/projects` - Listar todos (requer token)
-- `POST /api/v1/projects` - Criar novo (requer token)
-- `GET /api/v1/projects/{id}` - Obter por ID (requer token)
-- `PUT /api/v1/projects/{id}` - Atualizar (requer token)
-- `DELETE /api/v1/projects/{id}` - Deletar (requer token)
-
-#### Endpoints de Issues
-- `GET /api/v1/issues` - Listar issues (requer token)
-- `POST /api/v1/issues` - Criar nova (requer token)
-- `GET /api/v1/issues/{id}` - Obter por ID (requer token)
-- `PUT /api/v1/issues/{id}` - Atualizar (requer token)
-- `DELETE /api/v1/issues/{id}` - Deletar (requer token)
-
-#### Endpoints de Saúde
-- `GET /api/v1/health` - Health check com info de ambiente
-- `GET /api/v1/health/info` - Informações detalhadas da aplicação
-
-### 2. Integration Lib
-
-Biblioteca reutilizável com clients para integrações:
-
-#### GitHubIntegrationClient
-```java
-- getUser(username) - Obter dados do usuário GitHub
-- getRepository(owner, repo) - Obter repositório
-- getIssues(owner, repo) - Listar issues do repositório
+```text
+Bearer <token>
 ```
 
-#### SlackIntegrationClient
-```java
-- sendMessage(channel, message) - Enviar mensagem
-- getUser(userId) - Obter usuário
-- getChannel(channelId) - Obter canal
+## Rotas Públicas
+
+- `GET /api/v1/health`
+- `GET /api/v1/health/info`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/forgot-password`
+- `POST /api/v1/auth/reset-password`
+- `GET /api/v1/auth/reset-password/validate`
+- `POST /api/v1/users`
+- `/swagger-ui.html`
+- `/swagger-ui/**`
+- `/v3/api-docs/**`
+- `/graphiql`
+
+## Rotas Protegidas
+
+Requerem `Authorization: Bearer <token>`:
+
+- `GET /api/v1/auth/validate`
+- `POST /api/v1/auth/change-password`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/users/**`
+- `PUT /api/v1/users/**`
+- `GET|POST|PUT|DELETE /api/v1/projects/**`
+- `GET|POST|PUT|DELETE /api/v1/issues/**`
+- `GET|POST|PUT|DELETE /api/v1/comments/**`
+- `POST /graphql`
+
+Requerem usuário `ADMIN`:
+
+- `POST /api/v1/auth/token/{userId}`
+- `POST /api/v1/users/{id}/activate`
+- `POST /api/v1/users/{id}/deactivate`
+- `DELETE /api/v1/users/{id}`
+
+## Endpoints Principais
+
+### Autenticação
+
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/validate`
+- `GET /api/v1/auth/me`
+- `POST /api/v1/auth/change-password`
+- `POST /api/v1/auth/forgot-password`
+- `POST /api/v1/auth/reset-password`
+- `GET /api/v1/auth/reset-password/validate?token=...`
+- `POST /api/v1/auth/token/{userId}` (ADMIN)
+
+### Usuários
+
+- `POST /api/v1/users`
+- `GET /api/v1/users`
+- `GET /api/v1/users/{id}`
+- `GET /api/v1/users/username/{username}`
+- `GET /api/v1/users/email/{email}`
+- `GET /api/v1/users/role/{role}`
+- `PUT /api/v1/users/{id}`
+- `DELETE /api/v1/users/{id}` (ADMIN)
+- `POST /api/v1/users/{id}/activate` (ADMIN)
+- `POST /api/v1/users/{id}/deactivate` (ADMIN)
+
+### Projetos
+
+- `GET /api/v1/projects`
+- `POST /api/v1/projects`
+- `GET /api/v1/projects/{id}`
+- `GET /api/v1/projects/key/{key}`
+- `GET /api/v1/projects/lead/{lead}`
+- `PUT /api/v1/projects/{id}`
+- `DELETE /api/v1/projects/{id}`
+
+### Issues
+
+- `POST /api/v1/issues`
+- `GET /api/v1/issues/{id}`
+- `GET /api/v1/issues/key/{key}`
+- `GET /api/v1/issues/project/{projectId}`
+- `GET /api/v1/issues/assignee/{assignee}`
+- `GET /api/v1/issues/status/{status}`
+- `GET /api/v1/issues/project/{projectId}/status/{status}`
+- `PUT /api/v1/issues/{id}`
+- `DELETE /api/v1/issues/{id}`
+
+### Comentários
+
+- `POST /api/v1/comments`
+- `GET /api/v1/comments/{id}`
+- `GET /api/v1/comments/issue/{issueId}`
+- `GET /api/v1/comments/author/{author}`
+- `PUT /api/v1/comments/{id}`
+- `DELETE /api/v1/comments/{id}`
+
+## GraphQL
+
+O endpoint GraphQL fica em:
+
+```text
+POST /graphql
 ```
 
-### 3. Integration Service (Porto 8081)
+Ele requer Bearer token. Para testar no navegador, use:
 
-#### Controllers
-- `GET /api/v1/github/users/{username}` - Dados do usuário GitHub
-- `GET /api/v1/github/repos/{owner}/{repo}` - Informações do repositório
-- `GET /api/v1/github/repos/{owner}/{repo}/issues` - Issues do repositório
-
-- `POST /api/v1/slack/messages` - Enviar mensagem ao Slack
-- `GET /api/v1/slack/users/{userId}` - Obter usuário do Slack
-- `GET /api/v1/slack/channels/{channelId}` - Obter canal do Slack
-
-## Configuração
-
-### 1. MongoDB
-
-Certifique-se de que MongoDB está rodando:
-
-```bash
-docker run -d -p 27017:27017 --name mongodb mongo:latest
+```text
+http://localhost:8080/graphiql
 ```
 
-### 2. Docker Compose
+Exemplo:
 
-Ou use o `compose.yaml` fornecido:
-
-```bash
-docker-compose up -d
+```graphql
+query {
+  projects {
+    id
+    key
+    name
+    description
+    lead
+    projectType
+    createdAt
+  }
+}
 ```
 
-### 3. Variáveis de Ambiente
+Exemplo com filtro:
 
-Configure em `application.properties`:
-
-```properties
-# Jira
-server.port=8080
-spring.data.mongodb.uri=mongodb://localhost:27017/jira_db
-
-# Integration Service
-server.port=8081
-integration.github.token=seu-token-github
-integration.slack.token=xoxb-seu-token-slack
+```graphql
+query {
+  issuesByStatus(status: IN_PROGRESS) {
+    id
+    key
+    summary
+    priority
+    status
+    assignee
+    createdAt
+  }
+}
 ```
 
-## Build e Execução
+Consultas disponíveis:
 
-### Build do projeto
+- `projects`, `project`, `projectByKey`, `projectsByLead`
+- `issues`, `issue`, `issueByKey`, `issuesByProjectId`, `issuesByAssignee`, `issuesByStatus`, `issuesByProjectAndStatus`
+- `users`, `user`, `userByUsername`, `userByEmail`, `usersByRole`
+
+## Integration Service
+
+Swagger:
+
+```text
+http://localhost:8081/swagger-ui.html
+```
+
+Rotas:
+
+- `GET /api/v1/github/users/{username}`
+- `GET /api/v1/github/repos/{owner}/{repo}`
+- `GET /api/v1/github/repos/{owner}/{repo}/issues`
+- `POST /api/v1/slack/messages?channel={channel}&message={message}`
+- `GET /api/v1/slack/users/{userId}`
+- `GET /api/v1/slack/channels/{channelId}`
+
+## Collection
+
+A collection Postman/Insomnia fica em:
+
+```text
+collection.json
+```
+
+Fluxo recomendado:
+
+1. Execute **Autenticação / Login e Gerar Token**.
+2. A collection salva o token em `bearer_token`.
+3. Execute as rotas protegidas normalmente.
+
+## Build e Testes
+
 ```bash
 ./gradlew build
-```
-
-### Executar Jira Application
-```bash
-./gradlew :bootRun --args='--spring.profiles.active=jira'
-```
-
-### Executar Integration Service
-```bash
-./gradlew integration-service:bootRun
-```
-
-### Acessar APIs
-
-- **Jira Swagger**: http://localhost:8080/swagger-ui.html
-- **Jira API Docs**: http://localhost:8080/api-docs
-
-- **Integration Swagger**: http://localhost:8081/swagger-ui.html
-- **Integration API Docs**: http://localhost:8081/api-docs
-
-## Exemplos de Uso
-
-### Criar um Projeto
-```bash
-curl -X POST http://localhost:8080/api/v1/projects \
-  -H "Content-Type: application/json" \
-  -d '{
-    "key": "PROJ",
-    "name": "Meu Projeto",
-    "description": "Descrição do projeto",
-    "lead": "usuario@example.com",
-    "projectType": "SOFTWARE"
-  }'
-```
-
-### Criar uma Issue
-```bash
-curl -X POST http://localhost:8080/api/v1/issues \
-  -H "Content-Type: application/json" \
-  -d '{
-    "projectId": "id-do-projeto",
-    "summary": "Corrigir bug de login",
-    "description": "O login está falhando",
-    "issueType": "BUG",
-    "priority": "HIGH",
-    "status": "TO_DO",
-    "assignee": "usuario@example.com"
-  }'
-```
-
-### Consultar GitHub
-```bash
-curl http://localhost:8081/api/v1/github/users/torvalds
-```
-
-### Integração com Slack
-```bash
-curl -X POST http://localhost:8081/api/v1/slack/messages \
-  -H "Content-Type: application/json" \
-  -d '{
-    "channel": "#geral",
-    "message": "Nova issue criada no Jira"
-  }'
-```
-
-## Estrutura de Pasta
-
-```
-workspace/jira/
-├── build.gradle                    # Build do projeto principal
-├── settings.gradle                 # Configuração de módulos
-├── compose.yaml                    # Docker Compose
-├── gradlew / gradlew.bat          # Gradle wrapper
-├── src/
-│   ├── main/
-│   │   ├── java/com/project/jira/
-│   │   └── resources/
-│   └── test/
-├── integration-lib/
-│   ├── build.gradle
-│   ├── src/main/java/com/project/integration/
-│   └── src/test/
-├── integration-service/
-│   ├── build.gradle
-│   ├── src/main/java/com/project/integration/
-│   ├── src/main/resources/
-│   └── src/test/
-└── build/                          # Output de build
-```
-
-## Testes
-
-### Executar todos os testes
-```bash
 ./gradlew test
 ```
 
-### Testar módulo específico
-```bash
-./gradlew :integration-lib:test
-./gradlew :integration-service:test
+No Windows:
+
+```powershell
+.\gradlew.bat build
+.\gradlew.bat test
 ```
-
-## Segurança
-
-### Autenticação
-- JWT Bearer tokens para APIs
-- Configurado no Swagger
-
-### CORS
-- Configurar em caso de consumo por frontend
-
-### Validação
-- Validação de entrada em DTOs
-- Exception handlers para erros
-
-## Próximas Melhorias
-
-- [ ] Autenticação JWT completa
-- [ ] Integração com mais plataformas (Jira Cloud, GitLab, etc)
-- [ ] Rate limiting
-- [ ] Cache com Redis
-- [ ] Testes de integração
-- [ ] CI/CD com GitHub Actions
-- [ ] Containerização com Docker
-- [ ] Kubernetes deployment
-
-## Contribuindo
-
-Este projeto segue as melhores práticas de desenvolvimento Spring Boot.
-
-## Licença
-
-Apache 2.0
