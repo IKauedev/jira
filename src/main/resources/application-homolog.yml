@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: jira
+
+  data:
+    mongodb:
+      uri: mongodb://mongodb-homolog:27017/jira_db_homolog
+      auto-index-creation: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  devtools:
+    restart:
+      enabled: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    show-extensions: true
+
+jwt:
+  secret: homolog-secret-key-for-testing-environment-should-be-strong-and-unique-per-environment
+  expiration: 604800000
+
+logging:
+  level:
+    root: WARN
+    com.project.jira: INFO
+    org.springframework.web: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+app:
+  version: 1.0.0
+  title: Jira Backend Application
+  description: API Backend Jira com gerenciamento de projetos, issues e integrações
+  environment: homologation

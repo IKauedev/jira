@@ -1,0 +1,5 @@
+rootProject.name = 'jira'
+
+include 'integration-lib'
+include 'integration-service'
+

@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: jira
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://mongodb-prod:27017/jira_db_prod}
+      auto-index-creation: false
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  devtools:
+    restart:
+      enabled: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types:
+      - application/json
+      - application/xml
+      - text/html
+      - text/xml
+      - text/plain
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false
+    operations-sorter: method
+
+jwt:
+  secret: ${JWT_SECRET:change-me-in-production-env-variable-required}
+  expiration: 3600000
+
+logging:
+  level:
+    root: WARN
+    com.project.jira: WARN
+    org.springframework.web: WARN
+    org.springframework.security: ERROR
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+app:
+  version: 1.0.0
+  title: Jira Backend Application
+  description: API Backend Jira com gerenciamento de projetos, issues e integrações
+  environment: production
