@@ -21,7 +21,7 @@ fi
 
 echo ""
 echo "[INFO] Iniciando serviços com Docker Compose..."
-docker-compose -f docker-compose.override.yml up -d
+docker-compose -f docker/docker-compose.override.yml up -d
 
 if [ $? -ne 0 ]; then
     echo "[ERRO] Falha ao iniciar Docker Compose"
@@ -36,7 +36,7 @@ sleep 10
 # Verificar status dos containers
 echo ""
 echo "[INFO] Status dos containers:"
-docker-compose ps
+docker-compose -f docker/docker-compose.override.yml ps
 
 # Verificar conectividade
 echo ""
@@ -63,7 +63,7 @@ else
 fi
 
 echo "[TESTE] Integration Service Health Check..."
-curl -s http://localhost:8081/api/v1/health >/dev/null 2>&1
+curl -s http://localhost:8081/swagger-ui.html >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     echo "[OK] Integration Service está respondendo em http://localhost:8081"
     echo "     Swagger: http://localhost:8081/swagger-ui.html"
@@ -82,7 +82,7 @@ echo "- Integration Swagger:  http://localhost:8081/swagger-ui.html"
 echo "- MongoDB:              localhost:27017"
 echo ""
 echo "Comandos úteis:"
-echo "- Ver logs:             docker-compose logs -f"
-echo "- Parar serviços:       docker-compose down"
-echo "- Limpar volumes:       docker-compose down -v"
+echo "- Ver logs:             docker-compose -f docker/docker-compose.override.yml logs -f"
+echo "- Parar serviços:       docker-compose -f docker/docker-compose.override.yml down"
+echo "- Limpar volumes:       docker-compose -f docker/docker-compose.override.yml down -v"
 echo ""

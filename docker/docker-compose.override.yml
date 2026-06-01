@@ -1,0 +1,62 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: jira-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: jira_db
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - jira-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  jira-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.jira
+    container_name: jira-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/jira_db?authSource=admin
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - jira-network
+
+  integration-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.integration
+    container_name: integration-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/integration_db?authSource=admin
+      SPRING_PROFILES_ACTIVE: dev
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      SLACK_TOKEN: ${SLACK_TOKEN:-}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - jira-network
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+
+networks:
+  jira-network:
+    driver: bridge

@@ -25,7 +25,7 @@ if ! command -v docker-compose &> /dev/null; then
 fi
 
 echo -e "${YELLOW}[1/4] Iniciando containers Docker...${NC}"
-docker-compose -f docker-compose.override.yml up -d
+docker-compose -f docker/docker-compose.override.yml up -d
 
 echo -e "${YELLOW}Aguardando MongoDB iniciar...${NC}"
 sleep 10
@@ -59,5 +59,5 @@ echo "  2. Use os endpoints pré-configurados para testar a API"
 echo "  3. Verifique os logs em tempo real"
 echo ""
 echo "Para parar os containers:"
-echo "  docker-compose -f docker-compose.override.yml down"
+echo "  docker-compose -f docker/docker-compose.override.yml down"
 echo ""
