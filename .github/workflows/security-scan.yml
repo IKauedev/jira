@@ -61,6 +61,8 @@ jobs:
           format: table
 
       - name: Run OWASP Dependency-Check
+        env:
+          JAVA_HOME: ''
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: jira
