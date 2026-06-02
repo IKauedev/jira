@@ -16,6 +16,18 @@ spring:
     restart:
       enabled: false
 
+  mail:
+    host: ${SES_SMTP_HOST:${MAIL_HOST:email-smtp.us-east-1.amazonaws.com}}
+    port: ${SES_SMTP_PORT:${MAIL_PORT:587}}
+    username: ${SES_SMTP_USERNAME:${MAIL_USERNAME}}
+    password: ${SES_SMTP_PASSWORD:${MAIL_PASSWORD}}
+    properties:
+      mail:
+        smtp:
+          auth: ${SES_SMTP_AUTH:${MAIL_SMTP_AUTH:true}}
+          starttls:
+            enable: ${SES_SMTP_STARTTLS_ENABLE:${MAIL_SMTP_STARTTLS_ENABLE:true}}
+
 server:
   port: 8080
   servlet:
@@ -38,6 +50,19 @@ springdoc:
     enabled: ${SWAGGER_UI_ENABLED:false}
     operations-sorter: method
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
+
 jwt:
   secret: ${JWT_SECRET:change-me-in-production-env-variable-required}
   expiration: 3600000
@@ -56,3 +81,11 @@ app:
   title: Jira Backend Application
   description: API Backend Jira com gerenciamento de projetos, issues e integrações
   environment: production
+  email:
+    enabled: ${EMAIL_ENABLED:true}
+    provider: amazon-ses-smtp
+    from: ${SES_FROM_EMAIL:${MAIL_FROM}}
+  password-reset:
+    expiration-hours: ${PASSWORD_RESET_EXPIRATION_HOURS:24}
+    base-url: ${PASSWORD_RESET_BASE_URL}
+    include-token-in-response: false

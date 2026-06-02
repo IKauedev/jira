@@ -20,6 +20,18 @@ spring:
     graphiql:
       enabled: true
 
+  mail:
+    host: ${SES_SMTP_HOST:${MAIL_HOST:localhost}}
+    port: ${SES_SMTP_PORT:${MAIL_PORT:1025}}
+    username: ${SES_SMTP_USERNAME:${MAIL_USERNAME:}}
+    password: ${SES_SMTP_PASSWORD:${MAIL_PASSWORD:}}
+    properties:
+      mail:
+        smtp:
+          auth: ${SES_SMTP_AUTH:${MAIL_SMTP_AUTH:false}}
+          starttls:
+            enable: ${SES_SMTP_STARTTLS_ENABLE:${MAIL_SMTP_STARTTLS_ENABLE:false}}
+
 server:
   port: 8080
   servlet:
@@ -35,9 +47,22 @@ springdoc:
     display-request-duration: true
     show-extensions: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
+
 jwt:
-  secret: dev-secret-key-only-for-development-not-secure-at-all-change-in-production-immediately
-  expiration: 86400000
+  secret: ${JWT_SECRET_DEV:dev-secret-key-only-for-development-not-secure-at-all-change-in-production-immediately}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 logging:
   level:
@@ -53,3 +78,11 @@ app:
   title: Jira Backend Application
   description: API Backend Jira com gerenciamento de projetos, issues e integrações
   environment: development
+  email:
+    enabled: ${EMAIL_ENABLED:false}
+    provider: amazon-ses-smtp
+    from: ${SES_FROM_EMAIL:${MAIL_FROM:noreply@jira.local}}
+  password-reset:
+    expiration-hours: ${PASSWORD_RESET_EXPIRATION_HOURS:24}
+    base-url: ${PASSWORD_RESET_BASE_URL:http://localhost:8080/reset-password}
+    include-token-in-response: ${PASSWORD_RESET_INCLUDE_TOKEN_IN_RESPONSE:true}

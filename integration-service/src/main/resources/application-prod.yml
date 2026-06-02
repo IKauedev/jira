@@ -1,0 +1,29 @@
+spring:
+  data:
+    mongodb:
+      uri: ${INTEGRATION_MONGODB_URI}
+      auto-index-creation: false
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info}
+
+logging:
+  level:
+    root: WARN
+    com.project.integration: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+
+integration:
+  security:
+    apiKey: ${INTEGRATION_API_KEY}
+    headerName: ${INTEGRATION_API_KEY_HEADER:X-Integration-Api-Key}

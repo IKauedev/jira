@@ -27,6 +27,18 @@ spring:
     graphiql:
       enabled: true
 
+  mail:
+    host: ${SES_SMTP_HOST:${MAIL_HOST:localhost}}
+    port: ${SES_SMTP_PORT:${MAIL_PORT:1025}}
+    username: ${SES_SMTP_USERNAME:${MAIL_USERNAME:}}
+    password: ${SES_SMTP_PASSWORD:${MAIL_PASSWORD:}}
+    properties:
+      mail:
+        smtp:
+          auth: ${SES_SMTP_AUTH:${MAIL_SMTP_AUTH:false}}
+          starttls:
+            enable: ${SES_SMTP_STARTTLS_ENABLE:${MAIL_SMTP_STARTTLS_ENABLE:false}}
+
 # Server Configuration
 server:
   port: 8080
@@ -43,6 +55,22 @@ springdoc:
     tags-sorter: alpha
     display-request-duration: true
     show-extensions: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info}
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
 
 # JWT Configuration
 jwt:
@@ -66,5 +94,17 @@ app:
   title: Jira Backend Application
   description: API Backend Jira com gerenciamento de projetos, issues e integrações
   environment: default
+  email:
+    enabled: ${EMAIL_ENABLED:false}
+    provider: amazon-ses-smtp
+    from: ${SES_FROM_EMAIL:${MAIL_FROM:noreply@jira.local}}
   password-reset:
     expiration-hours: 24
+    base-url: ${PASSWORD_RESET_BASE_URL:http://localhost:8080/reset-password}
+    include-token-in-response: ${PASSWORD_RESET_INCLUDE_TOKEN_IN_RESPONSE:true}
+
+info:
+  app:
+    name: ${app.title}
+    version: ${app.version}
+    environment: ${app.environment}
