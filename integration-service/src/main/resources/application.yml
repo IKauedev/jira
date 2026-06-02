@@ -5,8 +5,8 @@ spring:
   # MongoDB Configuration
   data:
     mongodb:
-      uri: mongodb://localhost:27017/integration_db
-      auto-index-creation: true
+      uri: ${INTEGRATION_MONGODB_URI:mongodb://localhost:27017/integration_db}
+      auto-index-creation: ${MONGO_AUTO_INDEX_CREATION:true}
 
   # Jackson Configuration
   jackson:
@@ -24,10 +24,27 @@ server:
 springdoc:
   api-docs:
     path: /v3/api-docs
+    enabled: ${SWAGGER_ENABLED:true}
   swagger-ui:
-    enabled: true
+    enabled: ${SWAGGER_ENABLED:true}
     operations-sorter: method
     tags-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info}
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    mongo:
+      enabled: true
 
 # Logging Configuration
 logging:
@@ -40,14 +57,18 @@ logging:
 
 # Integration Properties
 integration:
+  security:
+    apiKey: ${INTEGRATION_API_KEY:}
+    headerName: ${INTEGRATION_API_KEY_HEADER:X-Integration-Api-Key}
+
   github:
-    baseUrl: https://api.github.com
+    baseUrl: ${GITHUB_API_URL:https://api.github.com}
     apiVersion: v3
     token: ${GITHUB_TOKEN:}
 
   slack:
     baseUrl: https://slack.com/api
-    token: ${SLACK_TOKEN:}
+    token: ${SLACK_TOKEN:${SLACK_BOT_TOKEN:}}
     webhookUrl: ${SLACK_WEBHOOK_URL:}
 
   email:
@@ -61,3 +82,9 @@ app:
   version: 1.0.0
   title: Integration Service API
   description: API centralizadora de integrações com GitHub, Slack e outras plataformas
+
+info:
+  app:
+    name: ${app.title}
+    version: ${app.version}
+    description: ${app.description}

@@ -278,3 +278,7 @@ No Windows:
 .\gradlew.bat build
 .\gradlew.bat test
 ```
+
+## AWS
+
+O projeto pode ser publicado na AWS usando ECR + App Runner, Secrets Manager/SSM, SES e CloudWatch Logs. O guia de variáveis, segredos e comandos de deploy está em [`AWS_DEPLOYMENT.md`](AWS_DEPLOYMENT.md).

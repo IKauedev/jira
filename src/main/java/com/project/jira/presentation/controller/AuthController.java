@@ -2,6 +2,7 @@ package com.project.jira.presentation.controller;
 
 import com.project.jira.application.dto.*;
 import com.project.jira.application.service.AuthService;
+import com.project.jira.application.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,10 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
+
+    @Value("${app.password-reset.include-token-in-response:false}")
+    private boolean includePasswordResetTokenInResponse;
 
     @PostMapping("/login")
     @Operation(summary = "Login e gerar token JWT", description = "Realiza login com credenciais e retorna um token JWT Bearer")
@@ -104,14 +110,14 @@ public class AuthController {
     })
     public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         String token = authService.createPasswordResetToken(request.getEmail());
-        
-        // Em produção, o token seria enviado por email
-        // Por enquanto, retornamos o token na resposta para testes
-        log.info("Token de redefinição gerado para {}: {}", request.getEmail(), token);
-        
-        return ResponseEntity.ok(MessageResponse.success(
-                "Se o email estiver cadastrado, você receberá as instruções de redefinição. Token (dev): " + token
-        ));
+        emailService.sendPasswordResetEmail(request.getEmail(), token);
+
+        String message = "Se o email estiver cadastrado, você receberá as instruções de redefinição.";
+        if (includePasswordResetTokenInResponse) {
+            message += " Token (dev): " + token;
+        }
+
+        return ResponseEntity.ok(MessageResponse.success(message));
     }
 
     @PostMapping("/reset-password")
@@ -166,7 +172,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = MessageResponse.class))
             ),
             @ApiResponse(responseCode = "400", description = "Senhas não conferem ou senha atual incorreta"),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
+            @ApiResponse(responseCode = "401", description = "Nao autenticado")
     })
     public ResponseEntity<MessageResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
@@ -202,7 +208,7 @@ public class AuthController {
                     description = "Dados do usuário",
                     content = @Content(schema = @Schema(implementation = LoginResponse.class))
             ),
-            @ApiResponse(responseCode = "401", description = "Não autenticado")
+            @ApiResponse(responseCode = "401", description = "Nao autenticado")
     })
     public ResponseEntity<LoginResponse> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

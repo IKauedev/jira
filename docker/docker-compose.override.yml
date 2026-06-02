@@ -29,6 +29,8 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/jira_db?authSource=admin
       SPRING_PROFILES_ACTIVE: dev
+      EMAIL_ENABLED: "false"
+      PASSWORD_RESET_INCLUDE_TOKEN_IN_RESPONSE: "true"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -47,6 +49,8 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       SLACK_TOKEN: ${SLACK_TOKEN:-}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
+      INTEGRATION_API_KEY: ${INTEGRATION_API_KEY:-}
     depends_on:
       mongodb:
         condition: service_healthy

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"message\":\"Não autenticado\"}");
+                    response.getWriter().write("{\"message\":\"Nao autenticado\"}");
                 }))
                 .authorizeHttpRequests(auth -> auth
                         // Health check - público

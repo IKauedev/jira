@@ -1,0 +1,23 @@
+spring:
+  data:
+    mongodb:
+      uri: ${INTEGRATION_MONGODB_URI:mongodb://localhost:27017/integration_db}
+      auto-index-creation: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.project.integration: DEBUG
+    org.springframework.web: DEBUG
+
+integration:
+  security:
+    # Chave padrao apenas para desenvolvimento. Sobrescreva via INTEGRATION_API_KEY se necessario.
+    apiKey: ${INTEGRATION_API_KEY:dev-integration-api-key-change-me}
+    headerName: ${INTEGRATION_API_KEY_HEADER:X-Integration-Api-Key}
